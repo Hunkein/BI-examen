@@ -11,7 +11,7 @@ def rename_enseigne(df, search_term, new_name):
 
 def load_station():
     # Load data
-    df_station = pd.read_csv("./BI/BI-examen/data/Infos_Stations.csv", dtype={'ID':str, 'Enseignes': str})
+    df_station = pd.read_csv("./data/Infos_Stations.csv", dtype={'ID':str, 'Enseignes': str})
     # remove accents, titlecase 
     df_station['Enseignes'] = df_station['Enseignes'].apply(lambda x: unidecode(x))
     df_station['Enseignes'] = df_station['Enseignes'].str.replace('i? 1/2', 'e')
@@ -43,7 +43,7 @@ def load_station():
 
 def load_price():
     # Load data
-    df_price = pd.read_csv("./BI/BI-examen/data/Prix_2024_2semaines.csv", dtype={'id':str, 'Date':str})
+    df_price = pd.read_csv("./data/Prix_2024_2semaines.csv", dtype={'id':str, 'Date':str})
     # Date to datetime
     df_price['Date'] = pd.to_datetime(df_price['Date'], format='%Y-%m-%d')
     # Supprime valeur inférieur à 0
@@ -52,8 +52,8 @@ def load_price():
 
 def load_data(df_station=load_station(), df_price=load_price()):
 
-    if os.path.exists('./BI/BI-examen/data/data.csv'):
-        df = pd.read_csv('./BI/BI-examen/data/data.csv', dtype={'ID':str, 'Date':str})
+    if os.path.exists('./data/data.csv'):
+        df = pd.read_csv('./data/data.csv', dtype={'ID':str, 'Date':str})
         df["Date"] = pd.to_datetime(df["Date"], format='%Y-%m-%d')
         return df
     
@@ -83,14 +83,14 @@ def load_data(df_station=load_station(), df_price=load_price()):
     df = df.groupby('ID').apply(cap_quantiles)
 
     # Sauvegarde des données
-    df.to_csv('./BI/BI-examen/data/data.csv', index=False)
+    df.to_csv('./data/data.csv', index=False)
 
 
     return df
 
 def load_concurrents(df_station=load_station(), df=load_data()):
-    if os.path.exists('./BI/BI-examen/data/concurrents.json'):
-        with open('./BI/BI-examen/data/concurrents.json', 'r') as f:
+    if os.path.exists('./data/concurrents.json'):
+        with open('./data/concurrents.json', 'r') as f:
             return json.load(f)
 
     id_coord_carrefour = dict_id_coord(df_station[df_station['Enseignes']=='Carrefour'])
@@ -100,7 +100,7 @@ def load_concurrents(df_station=load_station(), df=load_data()):
     for id_carrefour, coord_carrefour in tqdm(id_coord_carrefour.items()):
         concurrents[id_carrefour] = get_concurrents(id_coord, coord_carrefour[0], coord_carrefour[1], id_carrefour)
 
-    with open('./BI/BI-examen/data/concurrents.json', 'w') as f:
+    with open('./data/concurrents.json', 'w') as f:
         json.dump(concurrents, f)
     
     return concurrents

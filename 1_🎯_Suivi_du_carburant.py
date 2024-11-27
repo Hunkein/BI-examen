@@ -1,11 +1,5 @@
-from arrow import get
-from cv2 import sort
 import streamlit as st
 import pandas as pd
-from tqdm import tqdm
-import time
-from streamlit_extras.colored_header import colored_header 
-from streamlit.components.v1 import html
 from load_data import *
  
 
