@@ -48,7 +48,7 @@ st.markdown("""<style>
 # Chargement des données
 df_station = load_station()
 df = load_data(df_station=df_station)
-concurrents = load_concurrents(df_station)
+concurrents_all_station = load_concurrents(df_station)
 
 ### Sidebar
 # Logo
@@ -67,7 +67,7 @@ st.sidebar.markdown(
 st.sidebar.markdown("<h2 style='text-align: center;'>Filtres</h2>", unsafe_allow_html=True)
 
 # Sélection de la station Carrefour
-station = st.sidebar.selectbox("Station Carrefour", df_station['ID'].unique())
+station = st.sidebar.selectbox("Station Carrefour", concurrents_all_station.keys())
 
 # Selection des dates
 start_date = pd.to_datetime(st.sidebar.date_input("Date de début", df["Date"].min(), min_value=df["Date"].min(), max_value=df["Date"].max()))
@@ -76,7 +76,7 @@ df = df[(df["Date"] >= start_date) & (df["Date"] <= end_date)]
 
 # Sélection du rayon
 rayon = st.sidebar.select_slider("Sélectionne le rayon en km :", options=range(1,51,1), value=10)
-concurrents = {k: v for k, v in concurrents[station].items() if v <= rayon}
+concurrents = {k: v for k, v in concurrents_all_station[station].items() if v <= rayon}
 df = df[(df['ID'] == station) | (df["ID"].isin(concurrents.keys()))]
 df_station = df_station[(df_station['ID'] == station) | (df_station["ID"].isin(concurrents.keys()))]
 
