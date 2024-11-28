@@ -131,7 +131,7 @@ def get_concurrents(dict_id, lat, lon, id_carrefour):
     for id, coord in dict_id.items():
         if id != id_carrefour:
             distance = haversine(lat, lon, coord[0], coord[1])
-            if distance <= 10:
+            if distance <= 50:
                 concurrents[id] = distance
     return concurrents
 
