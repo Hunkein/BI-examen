@@ -12,7 +12,7 @@ st.set_page_config(page_title="Suivi des stations Carrefour", page_icon="📍", 
 
 st.markdown("""<style>
     #map_div {
-        text-align: center; 
+        text-align: center;
     }
     .card_kpi {
         text-align: center;
@@ -164,7 +164,7 @@ if selected_page == "1":
 
     # Affichage de la carte dans col_map
     with col_map:
-        st_folium(map, use_container_width=True)
+        st_folium(map, height=600, use_container_width=True)
 
 ## Tableau de comparaison des prix
 elif selected_page == "2":
@@ -173,19 +173,19 @@ elif selected_page == "2":
 
     col_gazole, col_sp95, col_sp98 = st.columns(3)
     col_gazole.markdown("<h3 style='text-align: center;'>Gazole</h3>", unsafe_allow_html=True)
-    col_gazole.dataframe(df_carburant_prix_moyen['Gazole'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
+    col_gazole.dataframe(df_carburant_prix_moyen['Gazole'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
     col_sp95.markdown("<h3 style='text-align: center;'>SP95</h3>", unsafe_allow_html=True)
-    col_sp95.dataframe(df_carburant_prix_moyen['SP95'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
+    col_sp95.dataframe(df_carburant_prix_moyen['SP95'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
     col_sp98.markdown("<h3 style='text-align: center;'>SP98</h3>", unsafe_allow_html=True)
-    col_sp98.dataframe(df_carburant_prix_moyen['SP98'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
+    col_sp98.dataframe(df_carburant_prix_moyen['SP98'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
 
     col_e10, col_e85, col_gplc= st.columns(3)
     col_e10.markdown("<h3 style='text-align: center;'>E10</h3>", unsafe_allow_html=True)
-    col_e10.dataframe(df_carburant_prix_moyen['E10'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
+    col_e10.dataframe(df_carburant_prix_moyen['E10'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
     col_e85.markdown("<h3 style='text-align: center;'>E85</h3>", unsafe_allow_html=True)
-    col_e85.dataframe(df_carburant_prix_moyen['E85'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
+    col_e85.dataframe(df_carburant_prix_moyen['E85'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
     col_gplc.markdown("<h3 style='text-align: center;'>GPLc</h3>", unsafe_allow_html=True)
-    col_gplc.dataframe(df_carburant_prix_moyen['GPLc'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
+    col_gplc.dataframe(df_carburant_prix_moyen['GPLc'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
 
 ## Graphique de l'évolution des prix 
 elif selected_page == "3":
