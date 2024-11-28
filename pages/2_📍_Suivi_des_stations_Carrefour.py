@@ -101,7 +101,7 @@ for carburant in ['Gazole', 'SP95', 'SP98', 'E10', 'E85', 'GPLc']:
         classements[carburant] = classement[0] + 1
     except:
         pass
-classements_global = sum(classements.values()) / len(classements)
+classements_global = round(sum(classements.values()) / len(classements), 1)
 
 # Sélection de l'onglet
 selected_page = stx.tab_bar(data=[
