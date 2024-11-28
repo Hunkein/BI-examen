@@ -208,9 +208,11 @@ elif selected_page == "2":
 
 ## Graphique de l'évolution des prix 
 elif selected_page == "3":
+    selected_enseigne = st.multiselect("Sélectionne les enseignes à afficher :", df['Enseignes'].unique(), default=df['Enseignes'].unique())
     def plot_evol_carburant(carburant, df):
         # Création du graphique avec les concurrents
         df_carburant = df[(df[carburant] > 0) & (df["Enseignes"]!='Carrefour')]
+        df_carburant = df_carburant[df_carburant['Enseignes'].isin(selected_enseigne)]
 
         fig = px.line(df_carburant, x='Date', y=carburant, 
                     color="Enseignes",line_group="ID",hover_name='Enseignes',
@@ -218,13 +220,14 @@ elif selected_page == "3":
                     color_discrete_sequence=px.colors.sequential.Sunsetdark)
         
         # Ajoute ligne carrefour
-        df_carburant_carrefour = df[(df[carburant] > 0) & (df["Enseignes"]=='Carrefour')]
-        fig.add_scatter(x=df_carburant_carrefour['Date'], 
-                        y=df_carburant_carrefour[carburant], 
-                        name='Carrefour', 
-                        mode='lines+markers',
-                        marker={'size': 10, 'color': 'lime', 'symbol':'triangle-up'},
-                        line=dict(color='green'))
+        if 'Carrefour' in selected_enseigne:
+            df_carburant_carrefour = df[(df[carburant] > 0) & (df["Enseignes"]=='Carrefour')]
+            fig.add_scatter(x=df_carburant_carrefour['Date'], 
+                            y=df_carburant_carrefour[carburant], 
+                            name='Carrefour', 
+                            mode='lines+markers',
+                            marker={'size': 10, 'color': 'lime', 'symbol':'triangle-up'},
+                            line=dict(color='green'))
         fig.update_layout(legend_title_text='Enseignes',
                         xaxis_title='Date',
                         yaxis_title='Prix (€)',
