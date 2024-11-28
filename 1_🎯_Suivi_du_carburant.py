@@ -1,9 +1,6 @@
 import streamlit as st
 import pandas as pd
 from load_data import *
- 
-# Selection marque
-# Selection date
 
 st.set_page_config(page_title="Suivi du carburant", page_icon="🎯", layout="wide")
 

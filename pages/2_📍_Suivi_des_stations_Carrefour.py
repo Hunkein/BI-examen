@@ -84,7 +84,6 @@ df_station = df_station[(df_station['ID'] == station) | (df_station["ID"].isin(c
 ## Titre
 st.markdown("<h2 style='text-align: center;'>Visualisation d'une station</h2>", unsafe_allow_html=True)
 
-
 ## Calcul informations de la station
 def get_df_comparaison(carburant, df):
     # Dataframe avec colonne Enseignes, ID, et Carburant.mean()
@@ -142,7 +141,8 @@ if selected_page == "1":
         folium.Marker(
             location=[df_station[df_station['ID'] == concurrent]['Latitude'].values[0], df_station[df_station['ID'] == concurrent]['Longitude'].values[0]],
             popup=f"<b>{df_station[df_station['ID'] == concurrent]['Enseignes'].values[0]} :</b><br>{df_station[df_station['ID'] == concurrent]['Adresse'].values[0]},{df_station[df_station['ID'] == concurrent]['Ville'].values[0]}",
-            icon=folium.Icon(color='red', icon='gas-pump', prefix='fa')
+            icon=folium.Icon(color='red', icon='gas-pump', prefix='fa'),
+            tooltip=f"<b>{df_station[df_station['ID'] == concurrent]['Enseignes'].values[0]} :</b><br>{df_station[df_station['ID'] == concurrent]['Adresse'].values[0]},{df_station[df_station['ID'] == concurrent]['Ville'].values[0]}"
         ).add_to(map)
 
     # Cerle de recherche
@@ -159,7 +159,8 @@ if selected_page == "1":
     folium.Marker(
         location=[df_station[df_station['ID'] == station]['Latitude'].values[0], df_station[df_station['ID'] == station]['Longitude'].values[0]],
         popup=f"<b>{df_station[df_station['ID'] == station]['Enseignes'].values[0]} : </b><br>{df_station[df_station['ID'] == station]['Adresse'].values[0]},{df_station[df_station['ID'] == station]['Ville'].values[0]}",
-        icon=folium.features.CustomIcon("./images/carrefour.png", icon_size=(40, 30))
+        icon=folium.features.CustomIcon("./images/carrefour.png", icon_size=(40, 30)),
+        tooltip=f"<b>{df_station[df_station['ID'] == station]['Enseignes'].values[0]} : </b><br>{df_station[df_station['ID'] == station]['Adresse'].values[0]},{df_station[df_station['ID'] == station]['Ville'].values[0]}"
     ).add_to(map)
 
     # Affichage de la carte dans col_map
@@ -173,19 +174,37 @@ elif selected_page == "2":
 
     col_gazole, col_sp95, col_sp98 = st.columns(3)
     col_gazole.markdown("<h3 style='text-align: center;'>Gazole</h3>", unsafe_allow_html=True)
-    col_gazole.dataframe(df_carburant_prix_moyen['Gazole'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
+    if 'Gazole' not in classements.keys():
+        col_gazole.warning("Aucune données pour ce carburant.")
+    else :
+        col_gazole.dataframe(df_carburant_prix_moyen['Gazole'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
     col_sp95.markdown("<h3 style='text-align: center;'>SP95</h3>", unsafe_allow_html=True)
-    col_sp95.dataframe(df_carburant_prix_moyen['SP95'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
+    if 'SP95' not in classements.keys():
+        col_sp95.warning("Aucune données pour ce carburant.")
+    else :
+        col_sp95.dataframe(df_carburant_prix_moyen['SP95'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
     col_sp98.markdown("<h3 style='text-align: center;'>SP98</h3>", unsafe_allow_html=True)
-    col_sp98.dataframe(df_carburant_prix_moyen['SP98'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
+    if 'SP98' not in classements.keys():
+        col_sp98.warning("Aucune données pour ce carburant.")
+    else :
+        col_sp98.dataframe(df_carburant_prix_moyen['SP98'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
 
     col_e10, col_e85, col_gplc= st.columns(3)
     col_e10.markdown("<h3 style='text-align: center;'>E10</h3>", unsafe_allow_html=True)
-    col_e10.dataframe(df_carburant_prix_moyen['E10'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
+    if 'E10' not in classements.keys():
+        col_e10.warning("Aucune données pour ce carburant.")
+    else :
+        col_e10.dataframe(df_carburant_prix_moyen['E10'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
     col_e85.markdown("<h3 style='text-align: center;'>E85</h3>", unsafe_allow_html=True)
-    col_e85.dataframe(df_carburant_prix_moyen['E85'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
+    if 'E85' not in classements.keys():
+        col_e85.warning("Aucune données pour ce carburant.")
+    else :
+        col_e85.dataframe(df_carburant_prix_moyen['E85'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
     col_gplc.markdown("<h3 style='text-align: center;'>GPLc</h3>", unsafe_allow_html=True)
-    col_gplc.dataframe(df_carburant_prix_moyen['GPLc'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
+    if 'GPLc' not in classements.keys():
+        col_gplc.warning("Aucune données pour ce carburant.")
+    else :
+        col_gplc.dataframe(df_carburant_prix_moyen['GPLc'].style.apply(highlight_Carrefour, axis=1), height=250, hide_index=True, use_container_width=True)
 
 ## Graphique de l'évolution des prix 
 elif selected_page == "3":
@@ -195,6 +214,7 @@ elif selected_page == "3":
 
         fig = px.line(df_carburant, x='Date', y=carburant, 
                     color="Enseignes",line_group="ID",hover_name='Enseignes',
+                    markers=True,
                     color_discrete_sequence=px.colors.sequential.Sunsetdark)
         
         # Ajoute ligne carrefour
@@ -202,7 +222,8 @@ elif selected_page == "3":
         fig.add_scatter(x=df_carburant_carrefour['Date'], 
                         y=df_carburant_carrefour[carburant], 
                         name='Carrefour', 
-                        mode='lines', 
+                        mode='lines+markers',
+                        marker={'size': 10, 'color': 'lime', 'symbol':'triangle-up'},
                         line=dict(color='green'))
         fig.update_layout(legend_title_text='Enseignes',
                         xaxis_title='Date',
