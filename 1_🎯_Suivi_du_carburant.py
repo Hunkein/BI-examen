@@ -58,8 +58,8 @@ st.sidebar.markdown(
 # Titre de la sidebar
 st.sidebar.markdown("<h2 style='text-align: center;'>Filtres</h2>", unsafe_allow_html=True)
 # Selection des dates
-start_date = pd.to_datetime(st.sidebar.date_input("Date de début", df["Date"].min()))
-end_date = pd.to_datetime(st.sidebar.date_input("Date de fin", df["Date"].max()))
+start_date = pd.to_datetime(st.sidebar.date_input("Date de début", df["Date"].min(), min_value=df["Date"].min(), max_value=df["Date"].max()))
+end_date = pd.to_datetime(st.sidebar.date_input("Date de fin", df["Date"].max(), min_value=df["Date"].min(), max_value=df["Date"].max()))
 df = df[(df["Date"] >= start_date) & (df["Date"] <= end_date)]
 
 
