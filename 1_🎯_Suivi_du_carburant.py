@@ -3,7 +3,7 @@ import pandas as pd
 from load_data import *
  
 
-st.set_page_config(page_title="Suivi du carburant", page_icon="🎯", layout='centered')
+st.set_page_config(page_title="Suivi du carburant", page_icon="🎯", layout="wide")
 
 # Chargement du style css
 
@@ -14,11 +14,15 @@ st.markdown("""<style>
         border-radius: 10px;
         box-shadow: 0 0 5px #d0d0d0;
         text-align: center; 
+        min-width: 200px;
     }
-
+    .stColumn p {
+        margin: 0;
+        font-size: 20px;
+    }
     .stColumn .stMarkdown p {
         margin: 0;
-        font-size: large;
+        font-size: 30px;
         font-weight: bold;
         height: 60px;
     }

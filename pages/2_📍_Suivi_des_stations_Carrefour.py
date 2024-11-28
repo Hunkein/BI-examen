@@ -7,7 +7,7 @@ import plotly.express as px
 
 from load_data import load_station, load_price, load_data, load_concurrents
 
-st.set_page_config(page_title="Suivi des stations Carrefour", page_icon="📍", layout='centered')
+st.set_page_config(page_title="Suivi des stations Carrefour", page_icon="📍", layout="wide")
 
 st.markdown("""<style>
     #map_div {
@@ -92,22 +92,22 @@ def get_df_comparaison(carburant, df):
 
 col_gazole, col_sp95, col_sp98 = st.columns(3)
 col_gazole.markdown("<h3 style='text-align: center;'>Gazole</h3>", unsafe_allow_html=True)
-col_gazole.dataframe(get_df_comparaison('Gazole', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True)
+col_gazole.dataframe(get_df_comparaison('Gazole', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
 col_sp95.markdown("<h3 style='text-align: center;'>SP95</h3>", unsafe_allow_html=True)
-col_sp95.dataframe(get_df_comparaison('SP95', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True)
+col_sp95.dataframe(get_df_comparaison('SP95', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
 col_sp98.markdown("<h3 style='text-align: center;'>SP98</h3>", unsafe_allow_html=True)
-col_sp98.dataframe(get_df_comparaison('SP98', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True)
+col_sp98.dataframe(get_df_comparaison('SP98', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
 
 col_e10, col_e85, col_gplc= st.columns(3)
 col_e10.markdown("<h3 style='text-align: center;'>E10</h3>", unsafe_allow_html=True)
-col_e10.dataframe(get_df_comparaison('E10', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True)
+col_e10.dataframe(get_df_comparaison('E10', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
 col_e85.markdown("<h3 style='text-align: center;'>E85</h3>", unsafe_allow_html=True)
-col_e85.dataframe(get_df_comparaison('E85', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True)
+col_e85.dataframe(get_df_comparaison('E85', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
 col_gplc.markdown("<h3 style='text-align: center;'>GPLc</h3>", unsafe_allow_html=True)
-col_gplc.dataframe(get_df_comparaison('GPLc', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True)
+col_gplc.dataframe(get_df_comparaison('GPLc', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
 
 ## Graphique de l'évolution des prix 
-st.markdown("<br><h2 style='text-align: center;'>Evolution des prix</h2><hr>", unsafe_allow_html=True)
+st.markdown("<br><h2 style='text-align: center;'>Évolution des prix</h2><hr>", unsafe_allow_html=True)
 
 def plot_evol_carburant(carburant, df):
     # Création du graphique avec les concurrents
