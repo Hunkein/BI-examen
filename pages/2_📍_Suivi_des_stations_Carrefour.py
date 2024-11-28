@@ -4,6 +4,7 @@ import pandas as pd
 import folium
 from streamlit_folium import st_folium
 import plotly.express as px
+import extra_streamlit_components as stx
 
 from load_data import load_station, load_price, load_data, load_concurrents
 
@@ -33,6 +34,12 @@ st.markdown("""<style>
     .card_kpi span {
         font-size: 50px;
         font-weight: bold;
+    }
+    div.stMainBlockContainer.block-container  {
+        padding-top: 50px !important;
+    }
+    #visualisation-d-une-station {
+        padding-top: 0;	
     }
     </style>
         """, 
@@ -75,9 +82,10 @@ df_station = df_station[(df_station['ID'] == station) | (df_station["ID"].isin(c
 
 ### Affichage
 ## Titre
-st.markdown("<h1 style='text-align: center;'>Visualisation d'une station</h1><hr>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center;'>Visualisation d'une station</h2>", unsafe_allow_html=True)
 
-## Informations de la station
+
+## Calcul informations de la station
 def get_df_comparaison(carburant, df):
     # Dataframe avec colonne Enseignes, ID, et Carburant.mean()
     df_carburant = df[df[carburant] > 0].groupby(['ID']).agg({carburant: 'mean'})
@@ -95,115 +103,133 @@ for carburant in ['Gazole', 'SP95', 'SP98', 'E10', 'E85', 'GPLc']:
         pass
 classements_global = sum(classements.values()) / len(classements)
 
-col_kpi, col_map = st.columns([1, 3])
-col_kpi.markdown(f"""
-        <h3>Station {df_station[df_station['ID'] == station]['Enseignes'].values[0]}</h3>
-        <h4>Adresse : </h4>
-        <h4>{df_station[df_station['ID'] == station]['Adresse'].values[0]}, {df_station[df_station['ID'] == station]['Ville'].values[0]}</h4>
-        <hr>
-        <div class="card_kpi">
-            <p> Nombre de concurrents dans un rayon de {rayon} km</p>
-            <span>{len(concurrents)}</span>
-        </div>
-        <div class="card_kpi">
-            <p> Classement globale </p>
-            <span>{classements_global} / {len(concurrents)}</span>
-        </div>
-            """, unsafe_allow_html=True)
+# Sélection de l'onglet
+selected_page = stx.tab_bar(data=[
+    stx.TabBarItemData(id=1, title="Carte", description="Carte et informations de la station"),
+    stx.TabBarItemData(id=2, title="Classement", description="Classement par rapport au concurrent"),
+    stx.TabBarItemData(id=3, title="Graphe", description="Evolution du prix"),
+], default=1)
+
+## Informations de la station et la carte
+if selected_page == "1":
+    # Informations de la station
+    col_kpi, col_map = st.columns([1, 3])
+    col_kpi.markdown(f"""
+            <h3>Station {df_station[df_station['ID'] == station]['Enseignes'].values[0]}</h3>
+            <h4>Adresse : </h4>
+            <h4>{df_station[df_station['ID'] == station]['Adresse'].values[0]}, {df_station[df_station['ID'] == station]['Ville'].values[0]}</h4>
+            <hr>
+            <div class="card_kpi">
+                <p> Nombre de concurrents dans un rayon de {rayon} km</p>
+                <span>{len(concurrents)}</span>
+            </div>
+            <div class="card_kpi">
+                <p> Classement globale </p>
+                <span>{classements_global} / {len(concurrents)}</span>
+            </div>
+                """, unsafe_allow_html=True)
 
 
-## Carte
-col_map.markdown("<h3 style='text-align: center;'>Carte des concurrents</h3>", unsafe_allow_html=True)
-map = folium.Map(
-    location=[df_station[df_station['ID'] == station]['Latitude'].values[0], df_station[df_station['ID'] == station]['Longitude'].values[0]],
-    zoom_start=13
-)
+    ## Carte
+    col_map.markdown("<h3 style='text-align: center;'>Carte des concurrents</h3>", unsafe_allow_html=True)
+    map = folium.Map(
+        location=[df_station[df_station['ID'] == station]['Latitude'].values[0], df_station[df_station['ID'] == station]['Longitude'].values[0]],
+        zoom_start=13
+    )
 
-# Ajout des concurrents
-for concurrent in concurrents.keys():
-    folium.Marker(
-        location=[df_station[df_station['ID'] == concurrent]['Latitude'].values[0], df_station[df_station['ID'] == concurrent]['Longitude'].values[0]],
-        popup=f"<b>{df_station[df_station['ID'] == concurrent]['Enseignes'].values[0]} :</b><br>{df_station[df_station['ID'] == concurrent]['Adresse'].values[0]},{df_station[df_station['ID'] == concurrent]['Ville'].values[0]}",
-        icon=folium.Icon(color='red', icon='gas-pump', prefix='fa')
+    # Ajout des concurrents
+    for concurrent in concurrents.keys():
+        folium.Marker(
+            location=[df_station[df_station['ID'] == concurrent]['Latitude'].values[0], df_station[df_station['ID'] == concurrent]['Longitude'].values[0]],
+            popup=f"<b>{df_station[df_station['ID'] == concurrent]['Enseignes'].values[0]} :</b><br>{df_station[df_station['ID'] == concurrent]['Adresse'].values[0]},{df_station[df_station['ID'] == concurrent]['Ville'].values[0]}",
+            icon=folium.Icon(color='red', icon='gas-pump', prefix='fa')
+        ).add_to(map)
+
+    # Cerle de recherche
+    folium.Circle(
+        location=[df_station[df_station['ID'] == station]['Latitude'].values[0], df_station[df_station['ID'] == station]['Longitude'].values[0]],
+        radius=rayon*1000,
+        color='blue',
+        fill=True,
+        fill_color='blue',
+        fill_opacity=0.15
     ).add_to(map)
 
-# Ajout de la station Carrefour
-folium.Marker(
-    location=[df_station[df_station['ID'] == station]['Latitude'].values[0], df_station[df_station['ID'] == station]['Longitude'].values[0]],
-    popup=f"<b>{df_station[df_station['ID'] == station]['Enseignes'].values[0]} : </b><br>{df_station[df_station['ID'] == station]['Adresse'].values[0]},{df_station[df_station['ID'] == station]['Ville'].values[0]}",
-    icon=folium.features.CustomIcon("./images/carrefour.png", icon_size=(40, 30))
-).add_to(map)
+    # Ajout de la station Carrefour
+    folium.Marker(
+        location=[df_station[df_station['ID'] == station]['Latitude'].values[0], df_station[df_station['ID'] == station]['Longitude'].values[0]],
+        popup=f"<b>{df_station[df_station['ID'] == station]['Enseignes'].values[0]} : </b><br>{df_station[df_station['ID'] == station]['Adresse'].values[0]},{df_station[df_station['ID'] == station]['Ville'].values[0]}",
+        icon=folium.features.CustomIcon("./images/carrefour.png", icon_size=(40, 30))
+    ).add_to(map)
 
-# Affichage de la carte dans col_map
-with col_map:
-    st_folium(map, use_container_width=True)
+    # Affichage de la carte dans col_map
+    with col_map:
+        st_folium(map, use_container_width=True)
 
 ## Tableau de comparaison des prix
-st.markdown("<br><h2 style='text-align: center;'>Tableau de comparaison des prix</h2><hr>", unsafe_allow_html=True)
+elif selected_page == "2":
+    def highlight_Carrefour(c):
+        return ['background-color: green' if c.Enseignes == 'Carrefour' else '' for _ in c]
 
-def highlight_Carrefour(c):
-    return ['background-color: green' if c.Enseignes == 'Carrefour' else '' for _ in c]
+    col_gazole, col_sp95, col_sp98 = st.columns(3)
+    col_gazole.markdown("<h3 style='text-align: center;'>Gazole</h3>", unsafe_allow_html=True)
+    col_gazole.dataframe(df_carburant_prix_moyen['Gazole'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
+    col_sp95.markdown("<h3 style='text-align: center;'>SP95</h3>", unsafe_allow_html=True)
+    col_sp95.dataframe(df_carburant_prix_moyen['SP95'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
+    col_sp98.markdown("<h3 style='text-align: center;'>SP98</h3>", unsafe_allow_html=True)
+    col_sp98.dataframe(df_carburant_prix_moyen['SP98'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
 
-col_gazole, col_sp95, col_sp98 = st.columns(3)
-col_gazole.markdown("<h3 style='text-align: center;'>Gazole</h3>", unsafe_allow_html=True)
-col_gazole.dataframe(df_carburant_prix_moyen['Gazole'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
-col_sp95.markdown("<h3 style='text-align: center;'>SP95</h3>", unsafe_allow_html=True)
-col_sp95.dataframe(df_carburant_prix_moyen['SP95'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
-col_sp98.markdown("<h3 style='text-align: center;'>SP98</h3>", unsafe_allow_html=True)
-col_sp98.dataframe(df_carburant_prix_moyen['SP98'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
-
-col_e10, col_e85, col_gplc= st.columns(3)
-col_e10.markdown("<h3 style='text-align: center;'>E10</h3>", unsafe_allow_html=True)
-col_e10.dataframe(df_carburant_prix_moyen['E10'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
-col_e85.markdown("<h3 style='text-align: center;'>E85</h3>", unsafe_allow_html=True)
-col_e85.dataframe(df_carburant_prix_moyen['E85'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
-col_gplc.markdown("<h3 style='text-align: center;'>GPLc</h3>", unsafe_allow_html=True)
-col_gplc.dataframe(df_carburant_prix_moyen['GPLc'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
+    col_e10, col_e85, col_gplc= st.columns(3)
+    col_e10.markdown("<h3 style='text-align: center;'>E10</h3>", unsafe_allow_html=True)
+    col_e10.dataframe(df_carburant_prix_moyen['E10'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
+    col_e85.markdown("<h3 style='text-align: center;'>E85</h3>", unsafe_allow_html=True)
+    col_e85.dataframe(df_carburant_prix_moyen['E85'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
+    col_gplc.markdown("<h3 style='text-align: center;'>GPLc</h3>", unsafe_allow_html=True)
+    col_gplc.dataframe(df_carburant_prix_moyen['GPLc'].style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True, use_container_width=True)
 
 ## Graphique de l'évolution des prix 
-st.markdown("<br><h2 style='text-align: center;'>Évolution des prix</h2><hr>", unsafe_allow_html=True)
+elif selected_page == "3":
+    def plot_evol_carburant(carburant, df):
+        # Création du graphique avec les concurrents
+        df_carburant = df[(df[carburant] > 0) & (df["Enseignes"]!='Carrefour')]
 
-def plot_evol_carburant(carburant, df):
-    # Création du graphique avec les concurrents
-    df_carburant = df[(df[carburant] > 0) & (df["Enseignes"]!='Carrefour')]
+        fig = px.line(df_carburant, x='Date', y=carburant, 
+                    color="Enseignes",line_group="ID",hover_name='Enseignes',
+                    color_discrete_sequence=px.colors.sequential.Sunsetdark)
+        
+        # Ajoute ligne carrefour
+        df_carburant_carrefour = df[(df[carburant] > 0) & (df["Enseignes"]=='Carrefour')]
+        fig.add_scatter(x=df_carburant_carrefour['Date'], 
+                        y=df_carburant_carrefour[carburant], 
+                        name='Carrefour', 
+                        mode='lines', 
+                        line=dict(color='green'))
+        fig.update_layout(legend_title_text='Enseignes',
+                        xaxis_title='Date',
+                        yaxis_title='Prix (€)',
+                        hovermode='closest',
+                        margin=dict(l=0, r=0, t=0, b=10)
+                        )
 
-    fig = px.line(df_carburant, x='Date', y=carburant, 
-                  color="Enseignes",line_group="ID",hover_name='Enseignes',
-                  color_discrete_sequence=px.colors.sequential.Sunsetdark)
-    
-    # Ajoute ligne carrefour
-    df_carburant_carrefour = df[(df[carburant] > 0) & (df["Enseignes"]=='Carrefour')]
-    fig.add_scatter(x=df_carburant_carrefour['Date'], 
-                    y=df_carburant_carrefour[carburant], 
-                    name='Carrefour', 
-                    mode='lines', 
-                    line=dict(color='green'))
-    fig.update_layout(legend_title_text='Enseignes',
-                      xaxis_title='Date',
-                      yaxis_title='Prix (€)',
-                      hovermode='closest',
-                      margin=dict(l=0, r=0, t=0, b=10)
-                      )
+        return fig
 
-    return fig
+    col_evo_gazole, col_evo_sp95 = st.columns(2)
+    col_evo_gazole.markdown("<h3 style='text-align: center;'>Gazole</h3>", unsafe_allow_html=True)
+    col_evo_gazole.plotly_chart(plot_evol_carburant('Gazole', df), use_container_width=True, config={'displayModeBar': False})
+    col_evo_sp95.markdown("<h3 style='text-align: center;'>SP95</h3>", unsafe_allow_html=True)
+    col_evo_sp95.plotly_chart(plot_evol_carburant('SP95', df), use_container_width=True, config={'displayModeBar': False})
 
-col_evo_gazole, col_evo_sp95 = st.columns(2)
-col_evo_gazole.markdown("<h3 style='text-align: center;'>Gazole</h3>", unsafe_allow_html=True)
-col_evo_gazole.plotly_chart(plot_evol_carburant('Gazole', df), use_container_width=True, config={'displayModeBar': False})
-col_evo_sp95.markdown("<h3 style='text-align: center;'>SP95</h3>", unsafe_allow_html=True)
-col_evo_sp95.plotly_chart(plot_evol_carburant('SP95', df), use_container_width=True, config={'displayModeBar': False})
+    col_evo_sp98, col_evo_e10 = st.columns(2)
+    col_evo_sp98.markdown("<h3 style='text-align: center;'>SP98</h3>", unsafe_allow_html=True)
+    col_evo_sp98.plotly_chart(plot_evol_carburant('SP98', df), use_container_width=True, config={'displayModeBar': False})
+    col_evo_e10.markdown("<h3 style='text-align: center;'>E10</h3>", unsafe_allow_html=True)
+    col_evo_e10.plotly_chart(plot_evol_carburant('E10', df), use_container_width=True, config={'displayModeBar': False})
 
-col_evo_sp98, col_evo_e10 = st.columns(2)
-col_evo_sp98.markdown("<h3 style='text-align: center;'>SP98</h3>", unsafe_allow_html=True)
-col_evo_sp98.plotly_chart(plot_evol_carburant('SP98', df), use_container_width=True, config={'displayModeBar': False})
-col_evo_e10.markdown("<h3 style='text-align: center;'>E10</h3>", unsafe_allow_html=True)
-col_evo_e10.plotly_chart(plot_evol_carburant('E10', df), use_container_width=True, config={'displayModeBar': False})
-
-col_evo_e85, col_evo_gplc = st.columns(2)
-col_evo_e85.markdown("<h3 style='text-align: center;'>E85</h3>", unsafe_allow_html=True)
-col_evo_e85.plotly_chart(plot_evol_carburant('E85', df), use_container_width=True, config={'displayModeBar': False})
-col_evo_gplc.markdown("<h3 style='text-align: center;'>GPLc</h3>", unsafe_allow_html=True)
-col_evo_gplc.plotly_chart(plot_evol_carburant('GPLc', df), use_container_width=True, config={'displayModeBar': False})
+    col_evo_e85, col_evo_gplc = st.columns(2)
+    col_evo_e85.markdown("<h3 style='text-align: center;'>E85</h3>", unsafe_allow_html=True)
+    col_evo_e85.plotly_chart(plot_evol_carburant('E85', df), use_container_width=True, config={'displayModeBar': False})
+    col_evo_gplc.markdown("<h3 style='text-align: center;'>GPLc</h3>", unsafe_allow_html=True)
+    col_evo_gplc.plotly_chart(plot_evol_carburant('GPLc', df), use_container_width=True, config={'displayModeBar': False})
 
 
 
