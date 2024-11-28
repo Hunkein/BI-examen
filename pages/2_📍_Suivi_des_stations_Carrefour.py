@@ -48,10 +48,6 @@ start_date = pd.to_datetime(st.sidebar.date_input("Date de début", df["Date"].m
 end_date = pd.to_datetime(st.sidebar.date_input("Date de fin", df["Date"].max()))
 df = df[(df["Date"] >= start_date) & (df["Date"] <= end_date)]
 
-# Séparer Carrefour avec toutes les enseignes
-df_carrefour = df[df['Enseignes'] == 'Carrefour']
-df = df[df['Enseignes'] != 'Carrefour']
-
 ### Affichage
 ## Titre
 st.markdown("<h1 style='text-align: center;'>Visualisation d'une station</h1>", unsafe_allow_html=True)
@@ -79,8 +75,7 @@ for concurrent in concurrents[station].keys():
     ).add_to(map)
 
 # Affichage de la carte
-# st_folium(map, use_container_width=True)
-
+st_folium(map, use_container_width=True)
 
 ## Tableau de comparaison des prix
 st.markdown("<h2 style='text-align: center;'>Tableau de comparaison des prix</h2>", unsafe_allow_html=True)
@@ -88,6 +83,20 @@ st.markdown("<h2 style='text-align: center;'>Tableau de comparaison des prix</h2
 def highlight_Carrefour(c):
     return ['background-color: green' if c.Enseignes == 'Carrefour' else '' for _ in c]
 
+def get_df_comparaison(carburant, df):
+    # Dataframe avec colonne Enseignes, ID, et Carburant.mean()
+    df_carburant = df[df[carburant] > 0].groupby(['ID']).agg({carburant: 'mean'})
+    df_carburant = df_carburant.merge(df_station[['ID', 'Enseignes']], on='ID', how='left')
+    return df_carburant.sort_values(by=carburant)
+
 col_gazole, col_sp95, col_sp98 = st.columns(3)
+col_gazole.dataframe(get_df_comparaison('Gazole', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True)
+col_sp95.dataframe(get_df_comparaison('SP95', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True)
+col_sp98.dataframe(get_df_comparaison('SP98', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True)
 
 col_e10, col_e85, col_gplc= st.columns(3)
+col_e10.dataframe(get_df_comparaison('E10', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True)
+col_e85.dataframe(get_df_comparaison('E85', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True)
+col_gplc.dataframe(get_df_comparaison('GPLc', df).style.apply(highlight_Carrefour, axis=1), height=350, hide_index=True)
+
+

@@ -31,7 +31,7 @@ def load_station():
     rename_enseigne(df_station, 'Carrefour Market', 'Carrefour')
     rename_enseigne(df_station, 'Carrefour Express', 'Carrefour')
     rename_enseigne(df_station, 'Carrefour Contact', 'Carrefour')
-    rename_enseigne(df_station, 'Carrefour Contact', 'Carrefour')
+    rename_enseigne(df_station, 'Crf Contact', 'Carrefour')
     rename_enseigne(df_station, 'U express', 'Super U')
     rename_enseigne(df_station, 'U Express', 'Super U')
     rename_enseigne(df_station, 'SUPER U', 'Super U')
@@ -85,7 +85,10 @@ def load_data(df_station=load_station(), df_price=load_price()):
 
     # Sauvegarde des données
     df.to_csv('./data/data.csv', index=False)
-
+    
+    # Séparer Carrefour avec toutes les enseignes concurrentes
+    df[df['Enseignes'] == 'Carrefour'].to_csv('./data/Carrefour.csv', index=False)
+    df[df['Enseignes'] != 'Carrefour'].to_csv('./data/Concurrents.csv', index=False)
 
     return df
 
