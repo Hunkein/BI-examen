@@ -70,6 +70,7 @@ st.sidebar.markdown("<h2 style='text-align: center;'>Filtres</h2>", unsafe_allow
 station = st.sidebar.selectbox("Station Carrefour", concurrents_all_station.keys())
 
 # Selection des dates
+st.sidebar.info(f"Date entre {df['Date'].min().strftime('%Y-%m-%d')} et {df['Date'].max().strftime('%Y-%m-%d')}")
 start_date = pd.to_datetime(st.sidebar.date_input("Date de début", df["Date"].min(), min_value=df["Date"].min(), max_value=df["Date"].max()))
 end_date = pd.to_datetime(st.sidebar.date_input("Date de fin", df["Date"].max(), min_value=df["Date"].min(), max_value=df["Date"].max()))
 df = df[(df["Date"] >= start_date) & (df["Date"] <= end_date)]
