@@ -57,7 +57,7 @@ st.sidebar.markdown(
 )
 
 # Titre de la sidebar
-st.sidebar.markdown("<h2 style='text-align: center;'>Paramètres</h2>", unsafe_allow_html=True)
+st.sidebar.markdown("<h2 style='text-align: center;'>Filtres</h2>", unsafe_allow_html=True)
 
 # Sélection de la station Carrefour
 station = st.sidebar.selectbox("Station Carrefour", df_station['ID'].unique())
@@ -82,7 +82,7 @@ def get_df_comparaison(carburant, df):
     # Dataframe avec colonne Enseignes, ID, et Carburant.mean()
     df_carburant = df[df[carburant] > 0].groupby(['ID']).agg({carburant: 'mean'})
     df_carburant = df_carburant.merge(df_station[['ID', 'Enseignes']], on='ID', how='left')
-    return df_carburant.sort_values(by=carburant).reset_index()
+    return df_carburant.sort_values(by=carburant).reset_index(drop=True)
 
 df_carburant_prix_moyen = {}
 classements = {}

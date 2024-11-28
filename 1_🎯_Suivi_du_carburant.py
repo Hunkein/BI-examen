@@ -53,7 +53,7 @@ st.sidebar.markdown(
 )
 
 # Titre de la sidebar
-st.sidebar.markdown("<h2 style='text-align: center;'>Paramètres</h2>", unsafe_allow_html=True)
+st.sidebar.markdown("<h2 style='text-align: center;'>Filtres</h2>", unsafe_allow_html=True)
 # Selection des dates
 start_date = pd.to_datetime(st.sidebar.date_input("Date de début", df["Date"].min()))
 end_date = pd.to_datetime(st.sidebar.date_input("Date de fin", df["Date"].max()))
