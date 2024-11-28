@@ -59,7 +59,7 @@ df = df[(df["Date"] >= start_date) & (df["Date"] <= end_date)]
 ## Affichage des KPIs
 
 # Titre
-st.markdown("<h2 style='text-align: center;'>KPIs</h2>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>KPIs</h1>", unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;'>Prix moyen en euros</h2>", unsafe_allow_html=True)
 
 def get_rank_delta_color(sort_kpis, price):
@@ -92,7 +92,7 @@ def get_kpis():
         sort_kpis = sorted([price_carrefour, price_auchan, price_leclerc, price_total_access, price_intermarche, price_super_u])
         
         index, delta_color = get_rank_delta_color(sort_kpis, price_carrefour)
-        kpis["Carrefour"][carburant] = {"Prix moyen": price_carrefour, "Classement": f"rang :{index}", "delta_color":delta_color}
+        kpis["Carrefour"][carburant] = {"Prix moyen": price_carrefour, "Classement": f"rang : {index}", "delta_color":delta_color}
         index, delta_color = get_rank_delta_color(sort_kpis, price_auchan)
         kpis["Auchan"][carburant] = {"Prix moyen": price_auchan, "Classement": f"rang : {index}", "delta_color":delta_color}
         index, delta_color = get_rank_delta_color(sort_kpis, price_leclerc)

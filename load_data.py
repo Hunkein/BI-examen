@@ -17,6 +17,10 @@ def load_station():
     df_station['Enseignes'] = df_station['Enseignes'].str.replace('i? 1/2', 'e')
     df_station['Enseignes'] = df_station['Enseignes'].str.title()
 
+    # Latitude and Longitude to float
+    df_station['Latitude'] = df_station['Latitude'].apply(lambda x: x/100000)
+    df_station['Longitude'] = df_station['Longitude'].apply(lambda x: x/100000)
+
     # Rename 
     rename_enseigne(df_station, 'Total Redon', 'Total')
     rename_enseigne(df_station, 'Total Energie', 'Total')
@@ -63,9 +67,6 @@ def load_data(df_station=load_station(), df_price=load_price()):
     # Drop colonne id
     df = df.drop(columns=['id'])
 
-    ## Conserver uniquement les stations routières
-    df = df[df['Type']=='R']
-
     # Garder les enseignes qui possèdent plus de 100 stations
     enseigne_count = df_station['Enseignes'].value_counts()
     enseigne_count = enseigne_count[enseigne_count>100].index.tolist()
@@ -88,13 +89,13 @@ def load_data(df_station=load_station(), df_price=load_price()):
 
     return df
 
-def load_concurrents(df_station=load_station(), df=load_data()):
+def load_concurrents(df_station=load_station()):
     if os.path.exists('./data/concurrents.json'):
         with open('./data/concurrents.json', 'r') as f:
             return json.load(f)
 
     id_coord_carrefour = dict_id_coord(df_station[df_station['Enseignes']=='Carrefour'])
-    id_coord = dict_id_coord(df)
+    id_coord = dict_id_coord(df_station[df_station['Enseignes']!='Carrefour'])
 
     concurrents = {}
     for id_carrefour, coord_carrefour in tqdm(id_coord_carrefour.items()):
@@ -135,5 +136,5 @@ def get_concurrents(dict_id, lat, lon, id_carrefour):
 def dict_id_coord(df):
     id_coord = {}
     for i, row in tqdm(df.iterrows()):
-        id_coord[row['ID']] = (row['Latitude']/100000, row['Longitude']/100000)
+        id_coord[row['ID']] = (row['Latitude'], row['Longitude'])
     return id_coord
