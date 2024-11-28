@@ -8,6 +8,9 @@ st.set_page_config(page_title="Suivi du carburant", page_icon="🎯", layout="wi
 # Chargement du style css
 
 st.markdown("""<style>
+    div.stMainBlockContainer.block-container  {
+        padding-top: 50px !important;
+    }
     .stColumn {
         padding: 5px;
         border: 1px solid #d0d0d0;
